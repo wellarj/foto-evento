@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       const dataUrl = `data:image/jpeg;base64,${base64}`;
 
       // Agora, fazemos o upload da imagem processada para o servidor FTP
-      const ftpClient = new FTPClient();
+      const client = new ftp.Client();
 
       try {
         // Conectar no servidor FTP
