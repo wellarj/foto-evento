@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gerador de Imagem com Moldura</title>
+</head>
+<body>
+  <input type="file" accept="image/*" id="upload" />
+  <input type="tel" placeholder="Digite o número com DDD" id="phone" />
+  <button id="capture">Capturar Câmera</button>
+  <canvas id="preview" style="display:none;"></canvas>
+  <button id="send">Enviar</button>
+  <div id="whatsapp-link"></div>
+
+  <script>
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('preview');
+    const ctx = canvas.getContext('2d');
+    const sendBtn = document.getElementById('send');
+    const phoneInput = document.getElementById('phone');
+    let finalBlob;
+
+    upload.addEventListener('change', e => {
+      const file = e.target.files[0];
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = 1080;
+        canvas.height = 1920;
+        ctx.drawImage(img, 0, 0, 1080, 1920);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    sendBtn.addEventListener('click', async () => {
+      canvas.toBlob(async blob => {
+        const formData = new FormData();
+        formData.append('image', blob, 'image.jpg');
+        formData.append('phone', phoneInput.value);
+
+        const res = await fetch('/api/process-image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await res.json();
+        const link = `https://wa.me/${data.phone}?text=${encodeURIComponent("Veja sua imagem: " + data.url)}`;
+        document.getElementById('whatsapp-link').innerHTML = `<a href="${link}" target="_blank">Compartilhar no WhatsApp</a>`;
+      }, 'image/jpeg');
+    });
+  </script>
+</body>
+</html>
