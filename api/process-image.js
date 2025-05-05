@@ -10,23 +10,38 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  const form = formidable();
-  form.parse(req, async (err, fields, files) => {
-    const phone = fields.phone.replace(/\D/g, '');
-    const imagePath = files.image[0].filepath;
+  try {
+    const form = formidable({ multiples: false });
+    
+    form.parse(req, async (err, fields, files) => {
+      if (err) {
+        console.error('Erro ao fazer parse:', err);
+        return res.status(500).json({ error: 'Erro no upload' });
+      }
 
-    const outputFile = `/tmp/${Date.now()}-final.jpg`;
-    const framePath = path.join(process.cwd(), 'public', 'frame.png');
+      const phone = fields.phone?.replace(/\D/g, '') || '';
+      const uploaded = files.image?.[0]?.filepath;
 
-    await sharp(imagePath)
-      .resize(1080, 1920)
-      .composite([{ input: framePath, gravity: 'center' }])
-      .jpeg()
-      .toFile(outputFile);
+      if (!uploaded) {
+        return res.status(400).json({ error: 'Imagem não enviada' });
+      }
 
-    const base64 = await fs.readFile(outputFile, { encoding: 'base64' });
-    const imageUrl = `data:image/jpeg;base64,${base64}`; // Você pode usar um CDN/Vercel Blob Storage em produção
+      const framePath = path.join(process.cwd(), 'public', 'frame.png');
+      const outputPath = `/tmp/${Date.now()}-final.jpg`;
 
-    res.status(200).json({ phone, url: imageUrl });
-  });
+      await sharp(uploaded)
+        .resize(1080, 1920)
+        .composite([{ input: framePath }])
+        .jpeg()
+        .toFile(outputPath);
+
+      const base64 = await fs.readFile(outputPath, { encoding: 'base64' });
+      const dataUrl = `data:image/jpeg;base64,${base64}`;
+
+      res.status(200).json({ phone, url: dataUrl });
+    });
+  } catch (e) {
+    console.error('Erro geral:', e);
+    res.status(500).json({ error: 'Erro interno no servidor' });
+  }
 }
