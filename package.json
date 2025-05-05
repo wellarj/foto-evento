@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "basic-ftp": "^4.6.0",
     "formidable": "^3.5.0",
     "sharp": "^0.32.1"
   }
