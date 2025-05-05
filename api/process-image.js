@@ -28,21 +28,19 @@ export default async function handler(req, res) {
       }
 
       const framePath = path.join(process.cwd(), 'public', 'frame.png');
-      const outputDir = path.join(process.cwd(), 'public', 'imagens');
-      const outputPath = path.join(outputDir, `${Date.now()}-final.jpg`);
+      const outputPath = path.join(process.cwd(), 'public', 'imagens', `${Date.now()}-final.jpg`);
 
-      // Criar o diretório 'public/imagens' caso não exista
-      await fs.mkdir(outputDir, { recursive: true });
+      // Corrigir o diretório de saída, caso não exista
+      await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
-      // Corrigir a orientação da imagem com EXIF e redimensionar
+      // Redimensionar e adicionar a moldura, sem alterar a rotação
       await sharp(uploaded)
-        .rotate() // Corrige a rotação com base nos dados EXIF
-        .resize(1080, 1920)
-        .composite([{ input: framePath }])
-        .jpeg()
-        .toFile(outputPath);
+        .resize(1080, 1920) // Redimensiona a imagem
+        .composite([{ input: framePath }]) // Adiciona a moldura
+        .jpeg() // Converte para formato JPEG
+        .toFile(outputPath); // Salva a imagem
 
-      // Retorna a URL da imagem salva na pasta 'public/imagens'
+      // Retorna a URL da imagem processada
       const imageUrl = `/imagens/${path.basename(outputPath)}`;
 
       res.status(200).json({ phone, url: imageUrl });
