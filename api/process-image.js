@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         .toFile(outputPath);
 
       // Salvar a imagem no FTP
-      const ftpClient = new FTPClient();
+      const ftpClient = new FTPClient();  // Não é necessário usar 'new', pois já é instanciado diretamente
       await ftpClient.access({
         host: process.env.FTP_HOST,
         user: process.env.FTP_USER,
