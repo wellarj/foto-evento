@@ -12,7 +12,7 @@ export const config = {
 export default async function handler(req, res) {
   try {
     const form = formidable({ multiples: false });
-    
+
     form.parse(req, async (err, fields, files) => {
       if (err) {
         console.error('Erro ao fazer parse:', err);
@@ -28,7 +28,11 @@ export default async function handler(req, res) {
       }
 
       const framePath = path.join(process.cwd(), 'public', 'frame.png');
-      const outputPath = path.join(process.cwd(), 'public', 'imagens', `${Date.now()}-final.jpg`);
+      const outputDir = path.join(process.cwd(), 'public', 'imagens');
+      const outputPath = path.join(outputDir, `${Date.now()}-final.jpg`);
+
+      // Criar o diretório 'public/imagens' caso não exista
+      await fs.mkdir(outputDir, { recursive: true });
 
       // Corrigir a orientação da imagem com EXIF e redimensionar
       await sharp(uploaded)
