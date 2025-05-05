@@ -1,6 +1,7 @@
 import formidable from 'formidable';
 import fs from 'fs/promises';
 import sharp from 'sharp';
+import path from 'path';  // Certifique-se de importar o módulo path
 import pkg from 'basic-ftp';
 const { FTPClient } = pkg;
 
