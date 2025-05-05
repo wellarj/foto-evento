@@ -12,8 +12,8 @@ export const config = {
 export default async function handler(req, res) {
   try {
     const form = formidable({ multiples: false });
-    
-   form.parse(req, async (err, fields, files) => {
+
+    form.parse(req, async (err, fields, files) => {
       if (err) {
         console.error('Erro ao fazer parse:', err);
         return res.status(500).json({ error: 'Erro no upload' });
@@ -31,6 +31,7 @@ export default async function handler(req, res) {
       const outputPath = `/tmp/${Date.now()}-final.jpg`;
 
       await sharp(uploaded)
+        .rotate()  // Corrige a rotação baseada nas metadadas EXIF
         .resize(1080, 1920)
         .composite([{ input: framePath }])
         .jpeg()
