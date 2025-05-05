@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   try {
     const form = formidable({ multiples: false });
     
-   form.parse(req, async (err, fields, files) => {
+    form.parse(req, async (err, fields, files) => {
       if (err) {
         console.error('Erro ao fazer parse:', err);
         return res.status(500).json({ error: 'Erro no upload' });
@@ -28,18 +28,20 @@ export default async function handler(req, res) {
       }
 
       const framePath = path.join(process.cwd(), 'public', 'frame.png');
-      const outputPath = `/tmp/${Date.now()}-final.jpg`;
+      const outputPath = path.join(process.cwd(), 'public', 'imagens', `${Date.now()}-final.jpg`);
 
+      // Corrigir a orientação da imagem com EXIF e redimensionar
       await sharp(uploaded)
+        .rotate() // Corrige a rotação com base nos dados EXIF
         .resize(1080, 1920)
         .composite([{ input: framePath }])
         .jpeg()
         .toFile(outputPath);
 
-      const base64 = await fs.readFile(outputPath, { encoding: 'base64' });
-      const dataUrl = `data:image/jpeg;base64,${base64}`;
+      // Retorna a URL da imagem salva na pasta 'public/imagens'
+      const imageUrl = `/imagens/${path.basename(outputPath)}`;
 
-      res.status(200).json({ phone, url: dataUrl });
+      res.status(200).json({ phone, url: imageUrl });
     });
   } catch (e) {
     console.error('Erro geral:', e);
