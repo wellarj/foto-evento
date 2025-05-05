@@ -13,13 +13,14 @@ export default async function handler(req, res) {
   try {
     const form = formidable({ multiples: false });
     
-    form.parse(req, async (err, fields, files) => {
+   form.parse(req, async (err, fields, files) => {
       if (err) {
         console.error('Erro ao fazer parse:', err);
         return res.status(500).json({ error: 'Erro no upload' });
       }
 
-      const phone = fields.phone?.replace(/\D/g, '') || '';
+      const phone = Array.isArray(fields.phone) ? fields.phone[0].replace(/\D/g, '') : '';
+
       const uploaded = files.image?.[0]?.filepath;
 
       if (!uploaded) {
