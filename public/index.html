@@ -27,7 +27,9 @@
 
     <div id="preview" class="card mt-4 p-4 shadow-sm text-center d-none">
       <h5 class="mb-3">Imagem Processada:</h5>
-      <img id="resultImage" src="" alt="Imagem final" class="img-fluid rounded" style="max-height: 500px;" />
+      <a href="" id="resultImageLink" download="download">
+        <img id="resultImage" src="" alt="Imagem final" class="img-fluid rounded" style="max-height: 500px;" />
+      </a>
       <div class="mt-3">
         <a id="whatsLink" href="#" target="_blank" class="btn btn-success">
           Enviar no WhatsApp
@@ -52,6 +54,7 @@
       if (result?.url) {
         document.getElementById('preview').classList.remove('d-none');
         document.getElementById('resultImage').src = result.url;
+        document.getElementById('resultImageLink').href = result.url;
 
         const message = encodeURIComponent('Sua imagem está pronta!');
         const link = `https://wa.me/55${result.phone}?text=${message}`;
