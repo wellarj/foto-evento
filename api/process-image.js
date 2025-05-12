@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       }
 
       const framePath = path.join(process.cwd(), 'public', 'frame.png');
-      const outputPath = /tmp/${Date.now()}-final.jpg;
+      const outputPath = `/tmp/${Date.now()}-final.jpg`;
 
       await sharp(uploaded)
         .resize(1080, 1920)
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
         .toFile(outputPath);
 
       const base64 = await fs.readFile(outputPath, { encoding: 'base64' });
-      const dataUrl = data:image/jpeg;base64,${base64};
+      const dataUrl = `data:image/jpeg;base64,${base64}`;
 
       res.status(200).json({ phone, url: dataUrl });
     });
