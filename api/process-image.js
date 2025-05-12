@@ -31,6 +31,7 @@ export default async function handler(req, res) {
       const outputPath = `/tmp/${Date.now()}-final.jpg`;
 
       await sharp(uploaded)
+        .withMetadata({ orientation: undefined }) // <- mantém rotação original
         .resize(1080, 1920)
         .composite([{ input: framePath }])
         .jpeg()
