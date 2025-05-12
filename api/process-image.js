@@ -30,12 +30,15 @@ export default async function handler(req, res) {
       const framePath = path.join(process.cwd(), 'public', 'frame.png');
       const outputPath = `/tmp/${Date.now()}-final.jpg`;
 
-      await sharp(uploaded)
-        .withMetadata({ orientation: undefined }) // <- mantém rotação original
-        .resize(1080, 1920)
-        .composite([{ input: framePath }])
-        .jpeg()
-        .toFile(outputPath);
+await sharp(uploaded)
+  .rotate() // Garante que a rotação do EXIF será aplicada
+  .resize(1080, 1920, {
+    fit: 'cover' // ou 'contain' se quiser evitar corte
+  })
+  .composite([{ input: framePath }])
+  .jpeg()
+  .toFile(outputPath);
+
 
       const base64 = await fs.readFile(outputPath, { encoding: 'base64' });
       const dataUrl = `data:image/jpeg;base64,${base64}`;
